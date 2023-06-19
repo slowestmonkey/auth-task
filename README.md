@@ -1,49 +1,45 @@
-# Node.js 
+# Auth logic demo
 
-Implemented functionality: 
+Implemented logic:
 
 - CRUD operations for customers (get, update, delete) by id or email;
-
 - login and signup operations for customers;
-
 - roles USER and ADMIN;
-
 - access token;
-
 - refresh token;
-
 - restrict access to get customers operation from unauthenticated users;
-
 - restrict access to delete customer and update customer operations from unauthenticated users and customers with USER role;
-
 - ability to verify customer's account after signup with activation code;
+
+## Architecture
+
+In its current state, the application introduces a very simple architecture to satisfy the essential requirements of the task. Therefore, the focus is on **Authentication** and **Authorization** processes.
+
+For a production-ready application, the separation of layers with delegated responsibilities should be considered. The current solution is very dependent on tools like `Prisma`, `Postgres` and `NestJS` in its business logic (services).
+
+Ideally business logic should be pure and independent and all details (like db, frameworks) should be injected using Dependency Injection (IOC practice). In our case that will require moving logic with `Prisma` to a database layer (repository) and reducing dependency on NestJS.
+
+Eventually, we might achieve the following:
+
+- presentation layer (http, graphql, dto)
+- business layer (domain logic)
+- database layer (postgres, prisma, redis)
 
 ## Installation
 
 ```bash
-# Install packages
+# install packages
 npm install
-
 npx prisma generate
 ```
 
-## Local database
+## Local setup
+
+1. create .env file using .env.example as reference
+2. setup environment locally
 
 ```bash
-# Setup local postgres
-docker run --name recruitment-task -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:11.16
-
-# Setup local redis
-
-docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest
-
-#create .env file with your local database credentials
-
-# Run migration
-npx prisma migrate dev
-
-# Run db seed
-npx prisma db seed
+make setup # in case of using Windows run commands from `Makefile.setup` one by one
 ```
 
 ## Running the app
@@ -54,26 +50,20 @@ $ yarn start
 
 # watch mode
 $ yarn start:dev
-
 ```
 
 ## Testing
 
 ```bash
-#
+# run integration tests
 $ yarn test
 ```
 
-// TODO:
+### Should be improved:
 
-- documentation
-- enhance error handling
-- finalize tests
-- dockerize app and docker-compose
-- validation of env vars
-- improve keys storage logic in key value storage (redis)
-- implement different environment with different configs
-
-### Architecture
-
-In the current state, the application introduces a very simple architecture to satisfy the essential requirements of the task which is the authentication and authorization process. To make introduce a production-ready solution better separation of layers should be considered. The current solution is very dependent on tools like Prisma and NestJs in its business logic layer (services). Ideally business logic should be pure and independent and all of the details (tools like db) should be injected using IOC (namely DI). In our case that will require moving logic with Prisma interaction to the database layer (repository).
+- documentation (Swagger)
+- enhance error handling (consider returning domain errors from the business layer)
+- dockerize app, add docker-compose better testing and deployingØ
+- validation of env vars before running the server
+- improve logic for storing tokens/codes in the `keyValue` storage
+- reinforce the business layer as described in the architecture section
