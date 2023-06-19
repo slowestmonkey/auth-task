@@ -29,7 +29,7 @@ Eventually, we might achieve the following:
 
 ```bash
 # install packages
-npm install
+yarn
 npx prisma generate
 ```
 

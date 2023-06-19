@@ -3,3 +3,7 @@ setup:
 	docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest
 	npx prisma migrate dev
 	npx prisma db seed
+
+clean:
+	docker container rm auth-task 
+	docker container rm redis-stack-server
