@@ -5,7 +5,7 @@ Implemented logic:
 - CRUD operations for customers (get, update, delete) by id or email;
 - login and signup operations for customers;
 - roles USER and ADMIN;
-- access token;
+- access token (with passport);
 - refresh token;
 - restrict access to get customers operation from unauthenticated users;
 - restrict access to delete customer and update customer operations from unauthenticated users and customers with USER role;
