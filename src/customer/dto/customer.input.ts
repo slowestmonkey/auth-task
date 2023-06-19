@@ -33,7 +33,7 @@ export class GetCustomerInput {
 }
 
 @InputType()
-export class CreateCustomerInput {
+export class SignupCustomerInput {
   @Field(() => String, { nullable: false })
   @IsEmail()
   email: string;

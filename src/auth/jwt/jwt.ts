@@ -1,7 +1,9 @@
+import { CustomerId, Role } from 'src/customer/customer';
+
 export type JwtPayload = {
   email: string;
-  sub: string;
-  role: string;
+  sub: CustomerId;
+  role: Role;
   iat: number;
   exp: number;
 };

@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Customer } from 'lib/entities/customer.entity';
-import { ActiveGuard } from 'src/auth/active/active.guard';
+import { ActiveCustomerGuard } from 'src/auth/active/active.guard';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { Public } from 'src/auth/public/public.decorator';
 import { Roles } from 'src/auth/roles/roles.decorator';
@@ -12,13 +12,13 @@ import {
   ActivateCustomerInput,
   DeleteCustomerInput,
   GetCustomerInput,
-  CreateCustomerInput as SignupCustomerInput,
+  SignupCustomerInput,
   UpdateCustomerInput,
   WhereCustomerInput,
 } from './dto/customer.input';
 
 @Resolver(() => Customer)
-@UseGuards(JwtAuthGuard, RolesGuard, ActiveGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, ActiveCustomerGuard)
 export class CustomerResolver {
   constructor(private readonly customerService: CustomerService) {}
 
@@ -38,6 +38,12 @@ export class CustomerResolver {
     return this.customerService.create(params);
   }
 
+  @Public()
+  @Mutation(() => Customer, { nullable: true })
+  async customerActivate(@Args('data') params: ActivateCustomerInput) {
+    await this.customerService.activate(params);
+  }
+
   @Roles(Role.Admin)
   @Mutation(() => Customer)
   async customerUpdate(@Args('data') params: UpdateCustomerInput) {
@@ -47,12 +53,6 @@ export class CustomerResolver {
   @Roles(Role.Admin)
   @Mutation(() => Customer)
   async customerDelete(@Args('data') params: DeleteCustomerInput) {
-    return this.customerService.delete(params.id);
-  }
-
-  @Public()
-  @Mutation(() => Customer, { nullable: true })
-  async customerActivate(@Args('data') params: ActivateCustomerInput) {
-    await this.customerService.activate(params.activationCode);
+    return this.customerService.delete(params);
   }
 }

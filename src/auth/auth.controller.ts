@@ -1,11 +1,11 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
-import { Customer } from 'src/customer/customer';
-import { AuthPayload } from './auth';
+import { Controller, Post, UseGuards } from '@nestjs/common';
+import { ActiveCustomerGuard } from './active/active.guard';
+import { AuthPayload, AuthUser, AuthUserWithRefreshToken } from './auth';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './common/current-user.decorator';
 import { JwtAuthGuard } from './jwt/jwt.guard';
 import { LocalAuthGuard } from './local/local.guard';
 import { RefreshAuthGuard } from './refresh/refresh.guards';
-import { ActiveGuard } from './active/active.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -13,25 +13,21 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(
-    @Request() request: Request & { user: Customer },
-  ): Promise<AuthPayload> {
-    return this.authService.login(request.user);
+  async login(@CurrentUser() user: AuthUser): Promise<AuthPayload> {
+    return this.authService.login(user);
   }
 
-  @UseGuards(RefreshAuthGuard, ActiveGuard)
+  @UseGuards(RefreshAuthGuard, ActiveCustomerGuard)
   @Post('refresh')
   async refreshToken(
-    @Request() request: Request & { user: Customer & { refreshToken: string } },
+    @CurrentUser() user: AuthUserWithRefreshToken,
   ): Promise<AuthPayload> {
-    return this.authService.refreshToken(request.user);
+    return this.authService.refreshToken(user);
   }
 
-  @UseGuards(JwtAuthGuard, ActiveGuard)
+  @UseGuards(JwtAuthGuard, ActiveCustomerGuard)
   @Post('logout')
-  async logout(
-    @Request() request: Request & { user: Customer },
-  ): Promise<void> {
-    await this.authService.logout(request.user);
+  async logout(@CurrentUser() user: AuthUser): Promise<void> {
+    await this.authService.logout(user);
   }
 }

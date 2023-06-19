@@ -8,7 +8,7 @@ import { Customer, CustomerId } from 'src/customer/customer';
 import { CustomerService } from 'src/customer/customer.service';
 import {
   AuthPayload,
-  LoginParams,
+  AuthUser,
   LogoutParams,
   RefreshTokenParams,
 } from './auth';
@@ -22,7 +22,7 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private readonly keyValueStorage: Cache,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<Customer> {
+  async validateCustomer(email: string, password: string): Promise<Customer> {
     const customer = await this.customerService.find({ email });
 
     if (!customer) {
@@ -38,7 +38,7 @@ export class AuthService {
     return customer;
   }
 
-  async login(params: LoginParams): Promise<AuthPayload> {
+  async login(params: AuthUser): Promise<AuthPayload> {
     const tokens = this.generateTokens(params);
 
     await this.storeRefreshToken(params.id, tokens.refreshToken);
@@ -70,14 +70,6 @@ export class AuthService {
     return tokens;
   }
 
-  private async storeRefreshToken(id: CustomerId, refreshToken: string) {
-    const hashSalt = this.configService.get('hashSalt');
-    const refreshTokenTTL = this.configService.get('jwt.refreshExpiresIn');
-    const refreshTokenHash = await hash(refreshToken, hashSalt);
-
-    await this.keyValueStorage.set(id, refreshTokenHash, refreshTokenTTL);
-  }
-
   private generateTokens(
     params: Pick<Customer, 'id' | 'email' | 'role'>,
   ): AuthPayload {
@@ -92,6 +84,17 @@ export class AuthService {
         expiresIn: refreshExpiresIn,
       }),
     };
+  }
+
+  private async storeRefreshToken(
+    id: CustomerId,
+    refreshToken: string,
+  ): Promise<void> {
+    const hashSalt = this.configService.get('hashSalt');
+    const refreshTokenTTL = this.configService.get('jwt.refreshExpiresIn');
+    const refreshTokenHash = await hash(refreshToken, hashSalt);
+
+    await this.keyValueStorage.set(id, refreshTokenHash, refreshTokenTTL);
   }
 
   async logout(params: LogoutParams): Promise<void> {

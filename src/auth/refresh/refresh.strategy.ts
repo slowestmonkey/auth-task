@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { AuthUserWithRefreshToken } from '../auth';
 import { JwtPayload } from '../jwt/jwt';
 
 @Injectable()
@@ -16,7 +17,10 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     });
   }
 
-  async validate(request: Request, { sub, email, role }: JwtPayload) {
+  async validate(
+    request: Request,
+    { sub, email, role }: JwtPayload,
+  ): Promise<AuthUserWithRefreshToken> {
     const authorization = request.get('authorization');
 
     if (!authorization) {

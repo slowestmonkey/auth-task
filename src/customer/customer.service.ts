@@ -11,8 +11,10 @@ import { Cache } from 'cache-manager';
 import { PrismaService } from 'src/prisma.service';
 import { Customer, CustomerId, HashedPassword } from './customer';
 import {
-  CreateCustomerInput,
+  ActivateCustomerInput,
+  DeleteCustomerInput,
   GetCustomerInput,
+  SignupCustomerInput,
   UpdateCustomerInput,
   WhereCustomerInput,
 } from './dto/customer.input';
@@ -33,7 +35,7 @@ export class CustomerService {
     return this.prisma.customer.findFirst({ where: params });
   }
 
-  async create(params: CreateCustomerInput): Promise<Customer> {
+  async create(params: SignupCustomerInput): Promise<Customer> {
     const duplicate = await this.find({ email: params.email });
 
     if (duplicate) {
@@ -61,14 +63,14 @@ export class CustomerService {
     const hashSalt = this.configService.get('hashSalt');
     const activationCode = await hash(id, hashSalt);
 
-    console.log('Activation code to send in email: ', activationCode);
+    console.log('Deliver activation code to customer: ', activationCode);
 
     const activationCodeTTL = this.configService.get('activationCodeTTL');
 
     await this.keyValueStorage.set(activationCode, id, activationCodeTTL);
   }
 
-  async activate(activationCode: string): Promise<void> {
+  async activate({ activationCode }: ActivateCustomerInput): Promise<void> {
     const customerId = await this.keyValueStorage.get<CustomerId>(
       activationCode,
     );
@@ -94,7 +96,7 @@ export class CustomerService {
     return this.prisma.customer.update({ where: { id }, data: params });
   }
 
-  async delete(id: CustomerId): Promise<Customer> {
+  async delete({ id }: DeleteCustomerInput): Promise<Customer> {
     const customer = await this.find({ id });
 
     if (!customer) {

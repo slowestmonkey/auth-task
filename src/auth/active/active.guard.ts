@@ -5,7 +5,7 @@ import { CustomerService } from 'src/customer/customer.service';
 import { IS_PUBLIC_KEY } from '../public/public.decorator';
 
 @Injectable()
-export class ActiveGuard implements CanActivate {
+export class ActiveCustomerGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly customerService: CustomerService,
