@@ -6,18 +6,18 @@ type Customer {
   id: ID!
 
   """Date and time when object was created."""
-  createdAt: Timestamp!
+  createdAt: DateTime!
 
   """Date and time when the object was updated last time."""
-  updatedAt: Timestamp!
+  updatedAt: DateTime!
   email: String!
   name: String!
 }
 
 """
-`Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
-scalar Timestamp
+scalar DateTime
 
 type Query {
   customers(data: GetCustomerInput!): [Customer!]!
@@ -34,21 +34,25 @@ input GetCustomerInput {
 input WhereCustomerInput {
   id: String
   email: String
-  createdAt: Timestamp
-  updatedAt: Timestamp
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type Mutation {
-  customerSignup(data: CreateCustomerInput!): Customer!
+  customerSignup(data: SignupCustomerInput!): Customer!
+  customerActivate(data: ActivateCustomerInput!): Customer
   customerUpdate(data: UpdateCustomerInput!): Customer!
   customerDelete(data: DeleteCustomerInput!): Customer!
-  customerActivate(data: ActivateCustomerInput!): Customer
 }
 
-input CreateCustomerInput {
+input SignupCustomerInput {
   email: String!
   name: String!
   password: String!
+}
+
+input ActivateCustomerInput {
+  activationCode: String!
 }
 
 input UpdateCustomerInput {
@@ -58,8 +62,4 @@ input UpdateCustomerInput {
 
 input DeleteCustomerInput {
   id: String!
-}
-
-input ActivateCustomerInput {
-  activationCode: String!
 }

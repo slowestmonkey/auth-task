@@ -2,7 +2,7 @@ import { Controller, Post, UseGuards } from '@nestjs/common';
 import { ActiveCustomerGuard } from './active/active.guard';
 import { AuthPayload, AuthUser, AuthUserWithRefreshToken } from './auth';
 import { AuthService } from './auth.service';
-import { CurrentUser } from './common/current-user.decorator';
+import { CurrentUser } from './jwt/current-user.decorator';
 import { JwtAuthGuard } from './jwt/jwt.guard';
 import { LocalAuthGuard } from './local/local.guard';
 import { RefreshAuthGuard } from './refresh/refresh.guards';
