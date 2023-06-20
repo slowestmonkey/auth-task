@@ -5,5 +5,7 @@ setup:
 	npx prisma db seed
 
 clean:
+	docker container stop auth-task 
+	docker container stop redis-stack-server
 	docker container rm auth-task 
 	docker container rm redis-stack-server
